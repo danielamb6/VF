@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Reportes de Incidencias</title>
+    
+    <script>
+        if (!localStorage.getItem('sesion')) {
+            window.location.href = "login.html";
+        }
+    </script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="logo-container">
+            <div class="logo-placeholder" id="logo-placeholder">
+                <i class="fas fa-tools"></i>
+            </div>
+            <img src="logo sin fondo.png" alt="Logo del Sistema" class="logo-img" onerror="document.getElementById('logo-placeholder').style.display='flex'; this.style.display='none'">            
+            <div class="logo-text">
+                <h1>Sistema de <span>Incidencias</span></h1>
+                <div class="subtitle">Panel de Administración</div>
+            </div>
+        </div>
+
+        <div class="top-user-info">
+            <div class="user-details">
+                <span id="display-user-name" style="font-weight: bold; color: var(--primary-blue);">Cargando...</span>
+                <small id="display-user-role" style="display: block; color: var(--text-light); font-size: 0.75rem; text-align: right;">...</small>
+            </div>
+            
+            <button id="btn-logout" style="background: var(--accent-color); color: white; margin-left: 15px; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; transition: transform 0.2s;">
+                <i class="fas fa-power-off"></i> Salir
+            </button>
+
+            <div class="top-user-avatar" data-tooltip="Usuario">AD</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="logo-sidebar">
+                <h2>Admin<span>Incidencias</span></h2>
+                <p>Sistema de Gestión</p>
+            </div>
+            <ul class="menu">
+                <li class="menu-item">
+                    <a href="#" class="menu-link active" id="nav-dashboard">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="nav-crearticket">
+                        <i class="fas fa-plus-circle"></i>
+                        <span>Creación de Tickets</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="Registro de usuario.html" class="menu-link">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Registro Usuarios</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="nav-incidencias">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Incidencias</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="nav-clientes">
+                        <i class="fas fa-user-tie"></i>
+                        <span>Clientes</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="nav-tecnicos">
+                        <i class="fas fa-users-cog"></i>
+                        <span>Técnicos</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="nav-catalogos">
+                        <i class="fas fa-book"></i>
+                        <span>Catálogos</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" id="nav-reportes">
+                        <i class="fas fa-file-export"></i>
+                        <span>Reportes</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            
+            <div id="view-dashboard">
+                <h1 class="page-title"><i class="fas fa-chart-bar"></i> Dashboard - Resumen General</h1>
+
+                <section class="filters">
+                    <h2><i class="fas fa-filter"></i> Filtrar Reporte</h2>
+                    <div class="filter-grid">
+                        <div class="filter-group">
+                            <label for="empresa"><i class="fas fa-building"></i> Empresa</label>
+                            <select id="empresa" class="filter-control">
+                                <option value="">Todas las empresas</option>
+                                <option value="zoxo">Zoxo</option>
+                                <option value="codiversa">Codiversa</option>
+                                <option value="copesa">Copesa </option>
+                                <option value="sitraq">Sitraq</option>
+                                <option value="corevsa">Corevsa</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="tecnico"><i class="fas fa-user-cog"></i> Técnico</label>
+                            <select id="tecnico" class="filter-control">
+                                <option value="">Todos los técnicos</option>                       
+                                <option value="juan_perez">Juan Pérez</option>
+                                <option value="maria_gomez">María Gómez</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="tipo-falla"><i class="fas fa-tools"></i> Tipo de Falla</label>
+                            <select id="tipo-falla" class="filter-control">
+                                <option value="">Todos los tipos</option>
+                                <option value="equipos">Equipos</option>
+                                <option value="elementos">Elementos</option>
+                                <option value="accesorios">Accesorios</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="estado"><i class="fas fa-clipboard-check"></i> Estado</label>
+                            <select id="estado" class="filter-control">
+                                <option value="">Todos los estados</option>
+                                <option value="ABIERTO">ABIERTO</option>
+                                <option value="EN ATENCIÓN">En ATENCIÓN</option>
+                                <option value="ESPERA_REFACCION">ESPERA_REFACCION</option>
+                                <option value="RESUELTO">RESUELTO</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label for="fecha-inicio"><i class="fas fa-calendar-alt"></i> Rango de Fechas</label>
+                            <div class="date-range" style="display:flex; gap:5px;">
+                                <input type="date" id="fecha-inicio" class="filter-control" style="flex: 1;">
+                                <input type="date" id="fecha-fin" class="filter-control" style="flex: 1;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="actions">
+                        <button class="btn btn-secondary" id="limpiar-filtros"><i class="fas fa-eraser"></i> Limpiar Filtros</button>
+                        <button class="btn btn-pdf" id="generar-pdf"><i class="fas fa-file-pdf"></i> Vista Previa PDF</button>
+                    </div>
+                </section>
+
+                <section class="data-summary">
+                    <div class="summary-card"><i class="fas fa-exclamation-triangle"></i><h3 id="total-incidencias">48</h3><p>Incidencias Totales</p></div>
+                    <div class="summary-card"><i class="fas fa-user-check"></i><h3>12</h3><p>Técnicos Activos</p></div>
+                    <div class="summary-card"><i class="fas fa-building"></i><h3>5</h3><p>Empresas</p></div>
+                    <div class="summary-card"><i class="fas fa-folder-open"></i><h3 id="abiertas-count">15</h3><p>Abiertas</p></div>
+                    <div class="summary-card"><i class="fas fa-hourglass-half"></i><h3 id="espera-count">8</h3><p>En atención</p></div>
+                    <div class="summary-card"><i class="fas fa-hourglass-half"></i><h3 id="espera-refaccion-count">3</h3><p>Espera Refacción</p></div>
+                    <div class="summary-card"><i class="fas fa-check-circle"></i><h3 id="cerradas-count">25</h3><p>Resuelto</p></div>
+                </section>
+
+                <section class="table-preview">
+                    <h2><i class="fas fa-history"></i> Vista Previa de Información de Incidencias</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Técnico</th>
+                                <th>Fecha</th>
+                                <th>Empresa</th>
+                                <th>Tipo de Falla</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="all-tickets-body"></tbody>
+                    </table>
+                </section>
+            </div>
+
+            <div id="view-crearticket" style="display: none;">
+                <h1 class="page-title"><i class="fas fa-plus-circle"></i> Creación de Nuevo Ticket</h1>
+                <section class="filters" style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+                    <form id="form-crear-ticket">
+                        <div class="filter-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                            <div class="filter-group">
+                                <label><i class="fas fa-tag"></i> Tipo</label>
+                                <input type="text" class="filter-control" value="Interno" readonly style="background-color: #f4f4f4; color: #888; cursor: not-allowed;">
+                            </div>
+                            <div class="filter-group">
+                                <label><i class="fas fa-bus"></i> Número de Autobús</label>
+                                <input type="number" id="new-bus-number" class="filter-control" placeholder="Número de unidad" required>
+                            </div>
+                            <div class="filter-group">
+                                <label><i class="fas fa-desktop"></i> Equipo</label>
+                                <select id="new-equipo" class="filter-control" required>
+                                    <option value="">Seleccione equipo</option>
+                                    <option value="dvr">DVR</option>
+                                    <option value="camara">Cámara</option>
+                                    <option value="monitor">Monitor</option>
+                                    <option value="gps">GPS</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label><i class="fas fa-tools"></i> Tipo de Falla Reportada</label>
+                                <select id="new-falla" class="filter-control" required>
+                                    <option value="">Seleccione falla</option>
+                                    <option value="no_enciende">No enciende</option>
+                                    <option value="disco_lleno">Error de disco</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label><i class="fas fa-user-tie"></i> Cliente que Reportó</label>
+                                <select id="new-cliente" class="filter-control" required>
+                                    <option value="">Seleccione cliente</option>
+                                    <option value="carlos_slim">Carlos Slim (ZOXO)</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label><i class="fas fa-user-cog"></i> Técnico que Atiende</label>
+                                <select id="new-tecnico" class="filter-control" required>
+                                    <option value="">Seleccione técnico</option>
+                                    <option value="juan_perez">Juan Pérez</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="actions" style="margin-top: 30px; justify-content: flex-end;">
+                            <button type="reset" class="btn btn-secondary"><i class="fas fa-times"></i> Cancelar</button>
+                            <button type="submit" class="btn btn-primary" style="background: var(--primary-blue);"><i class="fas fa-save"></i> Generar Ticket</button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+
+            <div id="view-incidencias" style="display: none;">
+                <h1 class="page-title"><i class="fas fa-tasks"></i> Gestión de Reportes Activos</h1>
+                <div class="table-preview">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Técnico</th>
+                                <th>Fecha</th>
+                                <th>Empresa</th>
+                                <th>Tiempo</th>
+                                <th>Tipo de Falla</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tickets-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-clientes" style="display: none;">
+                <h1 class="page-title"><i class="fas fa-user-tie"></i> Clientes Registrados</h1>
+                <div class="table-preview">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre del Cliente</th>
+                                <th>Empresa</th>
+                                <th>Contacto</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clientes-list-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-tecnicos" style="display: none;">
+                <h1 class="page-title"><i class="fas fa-users-cog"></i> Listado de Técnicos</h1>
+                <div class="table-preview">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre del Técnico</th>
+                                <th>Especialidad</th>
+                                <th>Tickets Resueltos</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tecnicos-especialidad-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-catalogos" style="display: none;">
+    <h1 class="page-title"><i class="fas fa-book"></i> Catálogos del Sistema</h1>
+    
+    <div class="data-summary" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;">
+        
+        <div class="summary-card catalog-card">
+            <div class="catalog-header">
+                <i class="fas fa-building"></i>
+                <p>Empresas</p>
+            </div>
+            <ul class="catalog-list" id="list-empresas">
+                <li>COPESA <button class="btn-delete-opt">&times;</button></li>
+                <li>COREVSA <button class="btn-delete-opt">&times;</button></li>
+                <li>CODIVERSA <button class="btn-delete-opt">&times;</button></li>
+                <li>SITRAQ <button class="btn-delete-opt">&times;</button></li>
+                <li>ZOXO <button class="btn-delete-opt">&times;</button></li>
+            </ul>
+            <button class="btn-add-opt" onclick="agregarOpcion('empresas')"><i class="fas fa-plus"></i> Agregar</button>
+        </div>
+
+        <div class="summary-card catalog-card">
+            <div class="catalog-header">
+                <i class="fas fa-desktop"></i>
+                <p>Equipos</p>
+            </div>
+            <ul class="catalog-list" id="list-equipos">
+                <li>CEIBA <button class="btn-delete-opt">&times;</button></li>
+                <li>MDVR <button class="btn-delete-opt">&times;</button></li>
+                <li>VALIDADOR <button class="btn-delete-opt">&times;</button></li>
+                <li>RADIOS <button class="btn-delete-opt">&times;</button></li>
+            </ul>
+            <button class="btn-add-opt" onclick="agregarOpcion('equipos')"><i class="fas fa-plus"></i> Agregar</button>
+        </div>
+
+        <div class="summary-card catalog-card">
+            <div class="catalog-header">
+                <i class="fas fa-microchip"></i>
+                <p>Elementos</p>
+            </div>
+            <ul class="catalog-list" id="list-elementos">
+                <li>PLATAFORMA <button class="btn-delete-opt">&times;</button></li>
+                <li>CÁMARA OPERADOR <button class="btn-delete-opt">&times;</button></li>
+                <li>DISPLAY / TOUCH <button class="btn-delete-opt">&times;</button></li>
+                <li>BOCINA <button class="btn-delete-opt">&times;</button></li>
+            </ul>
+            <button class="btn-add-opt" onclick="agregarOpcion('elementos')"><i class="fas fa-plus"></i> Agregar</button>
+        </div>
+
+        <div class="summary-card catalog-card">
+            <div class="catalog-header">
+                <i class="fas fa-biohazard"></i>
+                <p>Tipos de Falla</p>
+            </div>
+            <ul class="catalog-list" id="list-fallas">
+                <li>NO ACCESA <button class="btn-delete-opt">&times;</button></li>
+                <li>FUERA DE LINEA <button class="btn-delete-opt">&times;</button></li>
+                <li>ERROR ALMACENAMIENTO <button class="btn-delete-opt">&times;</button></li>
+                <li>NO LEE TARJETAS MI <button class="btn-delete-opt">&times;</button></li>
+            </ul>
+            <button class="btn-add-opt" onclick="agregarOpcion('fallas')"><i class="fas fa-plus"></i> Agregar</button>
+        </div>
+
+        <div class="summary-card catalog-card">
+            <div class="catalog-header">
+                <i class="fas fa-lightbulb"></i>
+                <p>Soluciones</p>
+            </div>
+            <ul class="catalog-list" id="list-soluciones">
+                <li>SE RESTABLECE CONEXIÓN <button class="btn-delete-opt">&times;</button></li>
+                <li>SE SUSTITUYE SENSOR <button class="btn-delete-opt">&times;</button></li>
+                <li>SE CONECTA <button class="btn-delete-opt">&times;</button></li>
+                <li>RETIRA PARA REVISIÓN <button class="btn-delete-opt">&times;</button></li>
+            </ul>
+            <button class="btn-add-opt" onclick="agregarOpcion('soluciones')"><i class="fas fa-plus"></i> Agregar</button>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    /* Estilos adicionales para mantener la visualización original con los nuevos botones */
+    .catalog-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 250px;
+        text-align: left !important;
+        padding: 20px !important;
+    }
+
+    .catalog-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        color: var(--primary-blue);
+    }
+
+    .catalog-list {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 15px 0;
+        flex-grow: 1;
+        font-size: 0.85rem;
+    }
+
+    .catalog-list li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 0;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        color: var(--text-secondary);
+    }
+
+    .btn-delete-opt {
+        background: none;
+        border: none;
+        color: var(--danger);
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 1.1rem;
+        padding: 0 5px;
+    }
+
+    .btn-add-opt {
+        background: var(--primary-blue);
+        color: white;
+        border: none;
+        padding: 8px;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        font-weight: 600;
+        transition: background 0.3s;
+    }
+
+    .btn-add-opt:hover {
+        background: var(--accent-color);
+    }
+</style>
+
+<script>
+    // Función para eliminar opciones (Añádela a tu Administrador.js o al final del HTML)
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-delete-opt')) {
+            if (confirm('¿Desea eliminar esta opción del catálogo?')) {
+                e.target.parentElement.remove();
+            }
+        }
+    });
+
+    // Función para agregar nuevas opciones
+    function agregarOpcion(tipo) {
+        const nuevaOpcion = prompt(`Ingrese el nuevo elemento para el catálogo de ${tipo}:`);
+        if (nuevaOpcion && nuevaOpcion.trim() !== "") {
+            const lista = document.getElementById(`list-${tipo}`);
+            const li = document.createElement('li');
+            li.innerHTML = `${nuevaOpcion.toUpperCase()} <button class="btn-delete-opt">&times;</button>`;
+            lista.appendChild(li);
+        }
+    }
+</script>
+
+            <div id="view-reportes" style="display: none;">
+                <h1 class="page-title"><i class="fas fa-file-export"></i> Historial de Reportes</h1>
+                <div class="table-preview">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Reporte</th>
+                                <th>Fecha</th>
+                                <th>Usuario</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reportes-history-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="modal" id="pdf-preview-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title"><i class="fas fa-file-pdf"></i> Vista Previa PDF</h2>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-primary" id="btn-descargar-final"><i class="fas fa-download"></i> Descargar</button>
+                    <button class="close-modal" id="close-modal">&times;</button>
+                </div>
+            </div>
+            <div id="pdf-content"></div>
+        </div>
+    </div>
+
+    <script src="Administrador.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const sesion = localStorage.getItem('sesion');
+        if (!sesion) {
+            window.location.href = "login.html"; 
+            return;
+        }
+        const datos = JSON.parse(sesion);
+        document.getElementById('display-user-name').textContent = datos.nombre;
+        document.getElementById('display-user-role').textContent = datos.rol.toUpperCase();
+
+        const navLinks = document.querySelectorAll('.menu-link');
+        const views = document.querySelectorAll('main > div');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                if(!this.id.startsWith('nav-')) return;
+                e.preventDefault();
+                navLinks.forEach(nl => nl.classList.remove('active'));
+                this.classList.add('active');
+                views.forEach(v => v.style.display = 'none');
+                const targetId = 'view-' + this.id.split('-')[1];
+                const targetView = document.getElementById(targetId);
+                if(targetView) targetView.style.display = 'block';
+            });
+        });
+
+        document.getElementById('btn-logout').addEventListener('click', function() {
+            localStorage.removeItem('sesion');
+            window.location.href = "login.html";
+        });
+    });
+    </script>
+</body>       
+</html>

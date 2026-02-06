@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Usuarios | Admin Incidencias</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #1a2980;
+            --secondary-blue: #26d0ce;
+            --accent-color: #AB096A;
+            --light-accent: #f8d4e8;
+            --gray-dark: #2c3e50;
+            --gray-medium: #34495e;
+            --gray-light: #ecf0f1;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --white: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-light: #999999;
+        }
+        
+        * { box-sizing: border-box; font-family: 'Arial', Helvetica, sans-serif; margin: 0; padding: 0; }
+        body { background: linear-gradient(135deg, var(--gray-light) 0%, #ffffff 100%); color: var(--text-primary); min-height: 100vh; }
+
+        .top-bar {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            color: var(--white);
+            padding: 10px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(26, 41, 128, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 3px solid var(--accent-color);
+            min-height: 70px;
+        }
+
+        .logo-container { display: flex; align-items: center; gap: 15px; }
+        .logo-wrapper { position: relative; width: 40px; height: 40px; }
+        .logo-img { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; display: block; }
+        .logo-fallback { width: 40px; height: 40px; background: linear-gradient(135deg, var(--white), var(--accent-color)); border-radius: 8px; display: none; align-items: center; justify-content: center; color: var(--white); font-weight: bold; font-size: 1.2rem; }
+        .logo-text { display: flex; flex-direction: column; justify-content: center; }
+        .logo-text h1 { color: var(--white); font-size: 1.4rem; font-weight: 700; letter-spacing: 0.5px; text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2); line-height: 1.2; margin: 0; }
+        .logo-text span { color: var(--accent-color); font-weight: 800; }
+        .logo-text .subtitle { font-size: 0.8rem; color: rgba(255, 255, 255, 0.85); margin-top: 2px; font-weight: 500; }
+
+        .nav-menu { display: flex; gap: 5px; margin: 0 20px; }
+        .nav-link { color: rgba(255, 255, 255, 0.85); text-decoration: none; padding: 8px 16px; border-radius: 6px; transition: all 0.3s ease; font-weight: 500; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+        .nav-link:hover, .nav-link.active { background-color: rgba(255, 255, 255, 0.15); color: var(--white); }
+
+        .top-user-info { display: flex; align-items: center; gap: 20px; }
+        .top-user-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue)); display: flex; align-items: center; justify-content: center; color: var(--white); font-weight: bold; font-size: 1rem; border: 2px solid var(--accent-color); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2); }
+        .user-details { text-align: right; }
+        .user-details .user-name { font-weight: 700; font-size: 0.95rem; color: var(--white); }
+        .user-details .user-role { font-size: 0.8rem; color: rgba(255, 255, 255, 0.9); }
+
+        .main-container { max-width: 1400px; margin: 30px auto; padding: 0 40px; }
+        .page-title { color: var(--primary-blue); font-size: 1.8rem; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid var(--accent-color); position: relative; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .page-title::before { content: ''; width: 8px; height: 30px; background: var(--accent-color); border-radius: 4px; }
+        .page-title-content { display: flex; align-items: center; gap: 10px; }
+
+        .btn { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem; display: inline-flex; align-items: center; gap: 8px; transition: all 0.3s ease; color: var(--white); box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); text-decoration: none; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
+        .btn-primary { background: linear-gradient(135deg, var(--accent-color) 0%, #8A0755 100%); }
+        .btn-secondary { background: linear-gradient(135deg, var(--gray-medium) 0%, var(--gray-dark) 100%); }
+        .btn-success { background: linear-gradient(135deg, var(--success) 0%, #2ecc71 100%); }
+
+        .form-card { background: linear-gradient(135deg, rgba(26, 41, 128, 0.05) 0%, rgba(38, 208, 206, 0.05) 100%); border-radius: 12px; padding: 30px; margin-bottom: 30px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); border: 1px solid rgba(171, 9, 106, 0.2); position: relative; overflow: hidden; }
+        .form-card::before { content: ''; position: absolute; top: 0; left: 0; width: 5px; height: 100%; background: linear-gradient(to bottom, var(--primary-blue), var(--accent-color)); }
+        .form-card h3 { color: var(--primary-blue); margin-bottom: 25px; font-size: 1.4rem; display: flex; align-items: center; gap: 10px; }
+        .form-card h3 i { color: var(--accent-color); }
+
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 8px; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 5px; }
+        .form-group .required { color: var(--danger); }
+        .form-control, .select-control { padding: 14px; border: 1px solid rgba(171, 9, 106, 0.3); border-radius: 6px; font-size: 1rem; background-color: var(--white); transition: all 0.3s ease; }
+        .form-control:focus { outline: none; border-color: var(--accent-color); box-shadow: 0 0 0 3px rgba(171, 9, 106, 0.2); }
+        
+        .select-control { appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23AB096A'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 10px center; background-size: 20px; padding-right: 40px; }
+
+        .form-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; padding-top: 25px; border-top: 1px solid rgba(171, 9, 106, 0.2); }
+
+        .table-container { background: var(--white); border-radius: 12px; padding: 25px; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08); border: 1px solid rgba(171, 9, 106, 0.2); position: relative; overflow-x: auto; }
+        .table-container::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(to right, var(--primary-blue), var(--accent-color)); }
+        
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 15px; }
+        table th { padding: 16px; text-align: left; color: var(--primary-blue); font-weight: 600; border-bottom: 2px solid var(--accent-color); background: rgba(26, 41, 128, 0.05); }
+        table td { padding: 16px; border-bottom: 1px solid rgba(171, 9, 106, 0.1); }
+
+        .role-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; color: var(--white); }
+        .role-admin { background: var(--accent-color); }
+        .role-tecnico { background: var(--primary-blue); }
+
+        .alert { padding: 15px; border-radius: 8px; margin-bottom: 20px; display: none; border-left: 4px solid var(--success); background-color: rgba(39, 174, 96, 0.1); color: #155724; }
+        
+        .action-buttons { display: flex; gap: 8px; }
+        .btn-icon { padding: 8px; border-radius: 6px; border: none; cursor: pointer; }
+        .btn-edit { color: var(--accent-color); background: rgba(171, 9, 106, 0.1); }
+        .btn-toggle { color: var(--primary-blue); background: rgba(26, 41, 128, 0.1); }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="logo-container">
+            <div class="logo-wrapper">
+                <div class="logo-fallback" style="display: flex;"><i class="fas fa-users"></i></div>
+            </div>
+            <div class="logo-text">
+                <h1>Sistema de <span>Incidencias</span></h1>
+                <div class="subtitle">Gestión de Usuarios</div>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <a href="#" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+            <a href="#" class="nav-link active"><i class="fas fa-users"></i> Usuarios</a>
+        </nav>
+        <div class="top-user-info">
+            <div class="top-user-avatar">AD</div>
+            <div class="user-details">
+                <div class="user-name">Administrador</div>
+                <div class="user-role">Gestor de Sistema</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="page-title">
+            <div class="page-title-content">
+                <i class="fas fa-user-plus"></i> Registro de Usuarios
+            </div>
+            <button class="btn btn-primary" id="btnNuevoUsuario"><i class="fas fa-plus"></i> Nuevo Usuario</button>
+        </div>
+
+        <div class="alert" id="successMessage">Usuario procesado con éxito</div>
+
+        <div class="form-card" id="formRegistro">
+            <h3><i class="fas fa-user-edit"></i> Información del Usuario</h3>
+            <form id="usuarioForm">
+                <input type="hidden" id="usuarioId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nombre(s) <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="nombre" placeholder="Ej: Juan" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Primer Apellido <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="apellido1" placeholder="Ej: Pérez" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Segundo Apellido</label>
+                        <input type="text" class="form-control" id="apellido2" placeholder="Ej: Rodríguez">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Correo Electrónico <span class="required">*</span></label>
+                        <input type="email" class="form-control" id="email" placeholder="usuario@empresa.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nombre de Usuario <span class="required">*</span></label>
+                        <input type="text" class="form-control" id="username" placeholder="Ej: jperez" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Rol <span class="required">*</span></label>
+                        <select class="select-control" id="rol" required>
+                            <option value="">Seleccionar rol</option>
+                            <option value="administrador">Administrador</option>
+                            <option value="tecnico">Técnico</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Contraseña <span class="required">*</span></label>
+                        <input type="password" class="form-control" id="password" placeholder="Mínimo 8 caracteres" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Confirmar Contraseña <span class="required">*</span></label>
+                        <input type="password" class="form-control" id="confirmPassword" placeholder="Repita la contraseña" required>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="btnCancelar">Cancelar</button>
+                    <button type="submit" class="btn btn-success" id="btnGuardar">
+                        <i class="fas fa-save"></i> Guardar Usuario
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="table-container">
+            <h3><i class="fas fa-list"></i> Usuarios Registrados</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre Completo</th>
+                        <th>Usuario</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaUsuarios">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Lógica de datos
+        class UsuarioService {
+            constructor() {
+                this.usuarios = JSON.parse(localStorage.getItem('usuarios_db')) || [
+                    { id: 1, nombre: "Juan", apellido1: "Pérez", apellido2: "García", username: "jperez", email: "juan@test.com", rol: "tecnico", activo: true }
+                ];
+            }
+
+            guardar(user) {
+                if (user.id) {
+                    const idx = this.usuarios.findIndex(u => u.id == user.id);
+                    this.usuarios[idx] = user;
+                } else {
+                    user.id = Date.now();
+                    user.activo = true;
+                    this.usuarios.push(user);
+                }
+                localStorage.setItem('usuarios_db', JSON.stringify(this.usuarios));
+            }
+
+            obtenerTodos() { return this.usuarios; }
+        }
+
+        const service = new UsuarioService();
+        const form = document.getElementById('usuarioForm');
+
+        function render() {
+            const tbody = document.getElementById('tablaUsuarios');
+            tbody.innerHTML = '';
+            service.obtenerTodos().forEach(u => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${u.nombre} ${u.apellido1} ${u.apellido2 || ''}</td>
+                    <td><strong>${u.username}</strong></td>
+                    <td>${u.email}</td>
+                    <td><span class="role-badge ${u.rol === 'administrador' ? 'role-admin' : 'role-tecnico'}">${u.rol}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-icon btn-edit" onclick="editar(${u.id})"><i class="fas fa-edit"></i></button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        form.onsubmit = (e) => {
+            e.preventDefault();
+            const pass = document.getElementById('password').value;
+            const conf = document.getElementById('confirmPassword').value;
+
+            if (pass !== conf) { alert("Las contraseñas no coinciden"); return; }
+
+            const user = {
+                id: document.getElementById('usuarioId').value,
+                nombre: document.getElementById('nombre').value,
+                apellido1: document.getElementById('apellido1').value,
+                apellido2: document.getElementById('apellido2').value,
+                email: document.getElementById('email').value,
+                username: document.getElementById('username').value,
+                rol: document.getElementById('rol').value
+            };
+
+            service.guardar(user);
+            form.reset();
+            document.getElementById('usuarioId').value = '';
+            render();
+            const alertBox = document.getElementById('successMessage');
+            alertBox.style.display = 'block';
+            setTimeout(() => alertBox.style.display = 'none', 3000);
+        };
+
+        window.editar = (id) => {
+            const u = service.obtenerTodos().find(user => user.id == id);
+            document.getElementById('usuarioId').value = u.id;
+            document.getElementById('nombre').value = u.nombre;
+            document.getElementById('apellido1').value = u.apellido1;
+            document.getElementById('apellido2').value = u.apellido2;
+            document.getElementById('email').value = u.email;
+            document.getElementById('username').value = u.username;
+            document.getElementById('rol').value = u.rol;
+            document.getElementById('formRegistro').scrollIntoView({behavior: 'smooth'});
+        };
+
+        document.getElementById('btnCancelar').onclick = () => {
+            form.reset();
+            document.getElementById('usuarioId').value = '';
+        };
+
+        render();
+    </script>
+</body>
+</html>
