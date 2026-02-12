@@ -161,88 +161,100 @@
                 </section>
             </div>
 
-            <div id="view-crearticket" style="display: none;">
-                <h1 class="page-title"><i class="fas fa-plus-circle"></i> Apertura de Ticket Interno</h1>
-                <section class="filters" style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                    <form id="form-crear-ticket">
-                        <div class="filter-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-                            <div class="filter-group">
-                                <label><i class="fas fa-lock"></i> Tipo</label>
-                                <input type="text" id="ticket-tipo" class="filter-control" value="INTERNO" readonly style="background: #f8f9fa; cursor: not-allowed;">
+                <div id="view-crearticket" style="display: none;">
+                    <h1 class="page-title"><i class="fas fa-plus-circle"></i> Crear Reporte Interno</h1>
+                    
+                    <section class="filters" style="background: white; padding: 25px; border-radius: 12px; margin-bottom: 30px;">
+                        <form id="form-ticket-interno">
+                            <div class="filter-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                                <div class="filter-group">
+                                    <label>Empresa (Asignar Folio)</label>
+                                    <select id="int-id-empresa" class="filter-control" required></select>
+                                </div>
+                                <div class="filter-group">
+                                    <label>Número de Autobús</label>
+                                    <input type="text" id="int-autobus" class="filter-control" required>
+                                </div>
+                                <div class="filter-group">
+                                    <label>Equipo</label>
+                                    <select id="int-equipo" class="filter-control" required></select>
+                                </div>
+                                <div class="filter-group">
+                                    <label>Falla Reportada</label>
+                                    <select id="int-falla" class="filter-control" required></select>
+                                </div>
                             </div>
-                            <div class="filter-group">
-                                <label><i class="fas fa-bus"></i> Número de Autobús</label>
-                                <input type="text" id="ticket-autobus" class="filter-control" placeholder="Ej. A-102" required>
-                            </div>
-                            <div class="filter-group">
-                                <label><i class="fas fa-desktop"></i> Equipo</label>
-                                <select id="select-equipo" class="filter-control" required>
-                                    <option value="">Seleccione equipo...</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label><i class="fas fa-exclamation-triangle"></i> Tipo de Falla Reportada</label>
-                                <select id="select-falla" class="filter-control" required>
-                                    <option value="">Seleccione falla...</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label><i class="fas fa-user-tie"></i> Cliente que reporta</label>
-                                <select id="select-cliente" class="filter-control" required>
-                                    <option value="">Seleccione cliente...</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label><i class="fas fa-user-cog"></i> Técnico que atiende</label>
-                                <select id="select-tecnico" class="filter-control" required>
-                                    <option value="">Seleccione técnico...</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="actions" style="margin-top: 25px; text-align: right;">
-                            <button type="submit" class="btn btn-primary" style="background: var(--primary-blue); border: none; padding: 12px 30px; border-radius: 8px; color: white; font-weight: 600; cursor: pointer;">
-                                <i class="fas fa-save"></i> Generar Ticket
-                            </button>
-                        </div>
-                    </form>
-                </section>
-            </div>
+                            <button type="submit" class="btn btn-primary" style="margin-top: 20px;">Generar Ticket</button>
+                        </form>
+                    </section>
 
+                    <div class="table-preview" style="background: white; padding: 20px; border-radius: 12px;">
+                        <table style="font-size: 0.7rem;">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Administrador</th>
+                                    <th>Empresa</th>
+                                    <th>Inicio / Fin</th>
+                                    <th>Equipo / Falla</th>
+                                    <th>Técnico / Solución</th>
+                                    <th>Observación</th>
+                                    <th>Estado</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-interna-body"></tbody>
+                        </table>
+                    </div>
+                    <h2 class="page-title" style="font-size: 1.1rem;"><i class="fas fa-file-medical"></i> Tabla de Reportes Extra (Internos)</h2>
+                    <div class="table-preview" style="background: white; padding: 20px; border-radius: 12px;">
+                        <table style="font-size: 0.7rem;">
+                            <thead>
+                                <tr>
+                                    <th>Código Extra</th>
+                                    <th>Ficha Origen</th>
+                                    <th>Equipo</th>
+                                    <th>Elemento / Acc</th>
+                                    <th>Revisión / Solución</th>
+                                    <th>Observación</th>
+                                    <th>Tipo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-extra-body"></tbody>
+                        </table>
+                    </div>
             <div id="view-incidencias" style="display: none;">
-                <h1 class="page-title"><i class="fas fa-tasks"></i> Gestión de Fichas Técnicas</h1>
-                <div class="table-preview">
-                    <table style="font-size: 0.8rem;">
-                        <thead>
-                            <tr>
-                                <th>ID Ficha</th>
-                                <th>Ticket</th>
-                                <th>Técnico</th>
-                                <th>Equipo (Elem/Acc)</th>
-                                <th>Revisión/Solución</th>
-                                <th>Ubicación</th>
-                                <th>Fechas (I/C)</th>
-                                <th>Estado</th>
-                                <th>Acción</th>
-                            </tr>
-                        </thead>
-                        <tbody id="incidencias-body"></tbody>
-                    </table>
+                    <h1 class="page-title"><i class="fas fa-tasks"></i> Gestión de Fichas Técnicas (Externas)</h1>
+                    <div class="table-preview" style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Folio</th>
+                                    <th>Empresa</th>
+                                    <th>Técnico</th>
+                                    <th>Equipo / Falla</th>
+                                    <th>Desglose Solución</th>
+                                    <th>Estado</th>
+                                    <th>Ubicación</th>
+                                    <th>Evidencia</th>
+                                </tr>
+                            </thead>
+                            <tbody id="incidencias-body"></tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
 
             <div id="view-clientes" style="display: none;">
                 <h1 class="page-title"><i class="fas fa-user-tie"></i> Lista de Clientes</h1>
-                
-                <div class="table-preview">
+                <div class="table-preview" style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
                     <table>
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Telegram (Contacto)</th>
+                                <th>Telegram</th>
                                 <th>Nombre Completo</th>
                                 <th>Empresa Asociada</th>
                                 <th>Estado</th>
-                                <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="clientes-list-body"></tbody>
@@ -252,13 +264,13 @@
 
             <div id="view-tecnicos" style="display: none;">
                 <h1 class="page-title"><i class="fas fa-users-cog"></i> Listado de Técnicos</h1>
-                <div class="table-preview">
+                <div class="table-preview" style="background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
                     <table>
                         <thead>
                             <tr>
                                 <th>Nombre del Técnico</th>
                                 <th>Especialidad</th>
-                                <th>ID Telegram (Contacto)</th>
+                                <th>ID Telegram</th>
                                 <th>Estado</th>
                             </tr>
                         </thead>
@@ -266,7 +278,6 @@
                     </table>
                 </div>
             </div>
-
             <div id="view-catalogos" style="display: none;">
                 <h1 class="page-title"><i class="fas fa-book"></i> Catálogos del Sistema</h1>
                 <div class="catalog-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 10px;">
